@@ -1,0 +1,4 @@
+*.pyc
+RESULT/
+CACHE/
+data/feature_map/feature_map_3d.npy
