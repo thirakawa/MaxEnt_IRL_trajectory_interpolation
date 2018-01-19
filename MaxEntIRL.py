@@ -70,10 +70,6 @@ class MaxEntIRL:
             print ""
 
 
-
-
-
-
     def load_image(self, input_filename, verbose=False):
         if verbose:
             print "load image..."
@@ -169,7 +165,7 @@ class MaxEntIRL:
 
 
     def compute_policy(self, output_filename=None, verbose=False):
-        if verbose
+        if verbose:
             print "compute policy..."
 
         policy = []
@@ -216,7 +212,7 @@ class MaxEntIRL:
                     policy[i][np.logical_not(is_pos), t] = 1.0 / (self.n_action - 1.0)
 
         # save policy map
-        if verbose
+        if verbose:
             print "    done"
             print ""
 
@@ -227,7 +223,7 @@ class MaxEntIRL:
 
 
     def compute_forecast_distribution(self, output_filename=None, verbose=False):
-        if verbose
+        if verbose:
             print "compute forecast distribution..."
 
         self.D = np.zeros(self.state_size, dtype=np.float32)
