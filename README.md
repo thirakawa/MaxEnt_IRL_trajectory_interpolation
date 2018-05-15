@@ -5,7 +5,7 @@ This repository contains example codes of trajectory interpolation method on the
 
 
 ## Citation
-If you find this codes useful, please cite this paper:
+If you find this code useful, please cite this paper:
 * T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," Ecosphere (submitted).
 
 
