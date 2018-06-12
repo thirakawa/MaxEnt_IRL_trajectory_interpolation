@@ -5,17 +5,17 @@
 # Copyright (C) 2018 Tsubasa Hirakawa. All rights reserved.
 ##############################################################
 
+
 import sys
 import numpy as np
 import cv2
-
 
 
 class MaxEntIRL:
 
     def __init__(self):
         self.w = None
-        self.feature_map = []
+        self.feature_map = np.empty([0])
         self.reward = []
         self.V = []
         self.pax = []
@@ -23,13 +23,13 @@ class MaxEntIRL:
         self.img = []
         self.start = []
         self.end = []
-        self.trajectory = []
+        self.trajectory = np.empty([0])
         self.FLOAT_MAX = 1e30
         self.FLOAT_MIN = 1e-30
         self.state_size = []
         self.n_action = 9
-        self.max_length= 610
-
+        self.n_feature = 0
+        self.max_length = 610
 
     def load_trajectory(self, input_filename, verbose=False):
         if verbose:
@@ -43,7 +43,6 @@ class MaxEntIRL:
             print "    end:", self.end
             print ""
 
-
     def load_reward_weights(self, input_filename, verbose=False):
         if verbose:
             print "load reward weights..."
@@ -51,7 +50,6 @@ class MaxEntIRL:
         if verbose:
             print " number of weights loaded:", self.w.shape[0]
             print ""
-
 
     def load_features(self, input_filename, verbose=False):
         if verbose:
@@ -69,7 +67,6 @@ class MaxEntIRL:
             print "    state space size:", self.state_size
             print ""
 
-
     def load_image(self, input_filename, verbose=False):
         if verbose:
             print "load image..."
@@ -77,7 +74,6 @@ class MaxEntIRL:
         if verbose:
             print "    done"
             print ""
-
 
     def compute_reward(self, bias=0.0, verbose=False):
         if verbose:
@@ -89,7 +85,6 @@ class MaxEntIRL:
         if verbose:
             print "    done"
             print ""
-
 
     def compute_soft_value_function(self, output_filename=None, verbose=False):
         if verbose:
@@ -123,11 +118,11 @@ class MaxEntIRL:
                     if y == 1 and x == 1:
                         continue
                     minv = np.minimum(v[0], v_padded[y:y + self.state_size[0],
-                                            x:x + self.state_size[1],
-                                            2:2 + self.state_size[2]])
+                                                     x:x + self.state_size[1],
+                                                     2:2 + self.state_size[2]])
                     maxv = np.maximum(v[0], v_padded[y:y + self.state_size[0],
-                                            x:x + self.state_size[1],
-                                            2:2 + self.state_size[2]])
+                                                     x:x + self.state_size[1],
+                                                     2:2 + self.state_size[2]])
 
                     softmax = maxv + np.log(1.0 + np.exp(minv - maxv))
 
@@ -162,7 +157,6 @@ class MaxEntIRL:
         print ""
         if output_filename is not None:
             np.save(output_filename, self.V)
-
 
     def compute_policy(self, output_filename=None, verbose=False):
         if verbose:
@@ -220,7 +214,6 @@ class MaxEntIRL:
 
         if output_filename is not None:
             np.save(output_filename, self.pax)
-
 
     def compute_forecast_distribution(self, output_filename=None, verbose=False):
         if verbose:
@@ -293,7 +286,6 @@ class MaxEntIRL:
         if output_filename is not None:
             np.save(output_filename, self.D)
 
-
     def map_probability(self, output_filename=None, verbose=False):
         print "mapping probability..."
         probability = np.sum(self.D, axis=2)
@@ -358,15 +350,15 @@ class MaxEntIRL:
         right[:, -1] = False
 
         border = []
-        border.append(np.logical_and(top, left))  # top-left
-        border.append(top.copy())  # top
-        border.append(np.logical_and(top, right))  # top-right
-        border.append(left.copy())  # left
+        border.append(np.logical_and(top, left))                # top-left
+        border.append(top.copy())                               # top
+        border.append(np.logical_and(top, right))               # top-right
+        border.append(left.copy())                              # left
         border.append(np.ones(self.state_size, dtype=np.bool))  # center (not used)
-        border.append(right.copy())  # right
-        border.append(np.logical_and(bottom, left))  # bottom-left
-        border.append(bottom.copy())  # bottom
-        border.append(np.logical_and(bottom, right))  # bottom-right
+        border.append(right.copy())                             # right
+        border.append(np.logical_and(bottom, left))             # bottom-left
+        border.append(bottom.copy())                            # bottom
+        border.append(np.logical_and(bottom, right))            # bottom-right
         return border
 
     def color_map_cumulative_prob(self, input_src):
@@ -390,7 +382,6 @@ class MaxEntIRL:
 
         dst = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB_FULL)
         return dst
-
 
     # for training ==========================================================
     def compute_empirical_feature_count(self):
@@ -418,7 +409,7 @@ class MaxEntIRL:
 
             if a < 0:
                 print "ERROR: invalid action %d(%d, %d)" % (t, dx, dy)
-                print "preprocess trajectory data property"
+                print "preproces trajectory data property"
                 sys.exit(-1)
 
             val = np.log(self.pax[a][self.trajectory[t, 0], self.trajectory[t, 1], self.trajectory[t, 2]])
@@ -430,10 +421,9 @@ class MaxEntIRL:
             ll += val
         return ll
 
-
     def accumulate_expected_feature_count(self):
         f_expected_tmp = []
-        for f in self.n_feature:
+        for f in range(self.n_feature):
             F = self.D * self.feature_map[f, :, :, :]
             f_expected_tmp.append(np.sum(F))
         return np.array(f_expected_tmp, dtype=np.float32)
