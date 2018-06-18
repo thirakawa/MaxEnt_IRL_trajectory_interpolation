@@ -130,6 +130,9 @@ class MaxEntIRL:
 
             v[0][is_searched] += self.reward[is_searched]
 
+            # bad code (bias for reward map)
+            v[0][is_searched] -= 10.0
+
             if np.sum(v[0][is_searched] > 0) > 0:
                 print "    ERROR: elements of V[0] should be lower that 0."
                 sys.exit(-1)

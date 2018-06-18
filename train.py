@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
         trainer.backward_forward_pass()
         trainer.gradient_update()
-        trainer.save_parameter(os.path.join(CACHE_DIR, "weight-%03d.txt" % iteration))
+        trainer.save_parameter(os.path.join(RESULT_DIR, "weight-%03d.txt" % iteration))
         iteration += 1
 
         end = time.time()

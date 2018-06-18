@@ -36,3 +36,4 @@ If you find this code useful, please cite this paper:
 
 ## Reference
 1. T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," (in preparation).
+
