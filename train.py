@@ -16,14 +16,12 @@ from MaxEntIRL import MaxEntIRL
 from util import chunk_list, read_text
 
 
-
 BASE_FILE = "./data/basename.txt"
 TRAJECTORY_PATH = "./data/tracking"
 FEATURE_MAP_FILE = "./data/feature_map/feature_map_3d.npy"
 IMAGE_FILE = "./data/image/image2.png"
 RESULT_DIR = "./RESULT"
 CACHE_DIR = "./CACHE"
-
 
 
 class Trainer:
@@ -70,7 +68,6 @@ class Trainer:
         if not os.path.exists(CACHE_DIR):
             os.mkdir(CACHE_DIR)
 
-
     def backward_forward_pass(self):
 
         thread = []
@@ -94,7 +91,6 @@ class Trainer:
         self.loglikelihood /= float(self.n_data)
         self.f_expected /= float(self.n_data)
 
-
     def back_forward_single_thread(self, basename, weight, thread_index):
 
         loglikelihood_tmp = []
@@ -102,7 +98,7 @@ class Trainer:
 
         for bn in basename:
             print bn
-            start = time.time()
+            _start = time.time()
 
             model = MaxEntIRL()
             model.load_trajectory(os.path.join(TRAJECTORY_PATH, bn + ".npy"))
@@ -119,14 +115,13 @@ class Trainer:
             loglikelihood_tmp.append(model.compute_trajectory_likelihood())
             f_expected_list.append(model.accumulate_expected_feature_count())
 
-            end = time.time()
+            _end = time.time()
 
-            print "done. time", end - start
+            print "done. time", _end - _start
 
         # save
         np.save(os.path.join(CACHE_DIR, "%d-%d-ll.npy" % (self.pid, thread_index)), np.array(loglikelihood_tmp))
         np.save(os.path.join(CACHE_DIR, "%d-%d-fexp.npy" % (self.pid, thread_index)), np.array(f_expected_list))
-
 
     def gradient_update(self):
 
@@ -165,14 +160,11 @@ class Trainer:
         print "f_empirical:", self.f_empirical
         print "f_expected:", self.f_expected
 
-
     def save_parameter(self, output_filename):
         np.savetxt(output_filename, self.w)
 
 
-
 if __name__ == '__main__':
-
 
     if not os.path.exists(RESULT_DIR):
         os.mkdir(RESULT_DIR)
@@ -193,4 +185,5 @@ if __name__ == '__main__':
         end = time.time()
         print "time of this iteration:", end - start, "s"
 
+    trainer.save_parameter(os.path.join(RESULT_DIR, "weight.txt"))
     print "train: done."

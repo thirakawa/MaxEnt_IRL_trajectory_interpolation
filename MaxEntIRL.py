@@ -134,7 +134,7 @@ class MaxEntIRL:
             v[0][is_searched] -= 10.0
 
             if np.sum(v[0][is_searched] > 0) > 0:
-                print "    ERROR: elements of V[0] should be lower that 0."
+                print "    ERROR: elements of V[0] should be lower than 0."
                 sys.exit(-1)
 
             # init goal
@@ -289,7 +289,7 @@ class MaxEntIRL:
         if output_filename is not None:
             np.save(output_filename, self.D)
 
-    def map_probability(self, output_filename=None, verbose=False):
+    def map_probability(self, output_filename=None):
         print "mapping probability..."
         probability = np.sum(self.D, axis=2)
         dst = self.color_map_cumulative_prob(probability)
@@ -399,9 +399,9 @@ class MaxEntIRL:
 
 
     def compute_trajectory_likelihood(self):
-        trans_index = np.array([[0,1,2],
-                                [3,-1,5],
-                                [6,7,8]], dtype=np.int32)
+        trans_index = np.array([[0,  1, 2],
+                                [3, -1, 5],
+                                [6,  7, 8]], dtype=np.int32)
         ll = 0.0
 
         for t in range(self.trajectory.shape[0] - 1):

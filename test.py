@@ -15,7 +15,7 @@ from util import chunk_list, read_text
 
 
 BASE_FILE = "./data/basename.txt"
-TRAJECTORY_PATH = "./data/tracking"
+TRAJECTORY_PATH = "./data/tracking/"
 FEATURE_MAP_FILE = "./data/feature_map/feature_map_3d.npy"
 IMAGE_FILE = "./data/image/image2.png"
 RESULT_DIR = "./RESULT"
@@ -30,7 +30,7 @@ def optimal_control_single_thread(input_base_list, input_weight_path):
 
 def optimal_control_one_sample(input_base, input_weight_path):
     model = MaxEntIRL()
-    model.load_trajectory(TRAJECTORY_PATH + input_base + ".npy")
+    model.load_trajectory(os.path.join(TRAJECTORY_PATH, input_base + ".npy"))
     model.load_reward_weights(input_weight_path)
     model.load_features(FEATURE_MAP_FILE)
     model.load_image(IMAGE_FILE)
@@ -53,7 +53,7 @@ def optimal_control_one_sample(input_base, input_weight_path):
 
 if __name__ == '__main__':
 
-    trained_weight_file = "./RESULT/weight.txt"
+    trained_weight_file = "./RESULT/weight-015.txt"
     n_cpu = mp.cpu_count()
 
     if not os.path.exists(RESULT_DIR):
