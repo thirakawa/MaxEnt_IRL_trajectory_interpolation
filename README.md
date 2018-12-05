@@ -1,12 +1,12 @@
 # Maximum Entropy Inverse Reinforcement Learning for Trajectory Interpolation
 
-This repository contains example codes of trajectory interpolation method on the basis of maximum entropy inverse reinforcement learning [1].
+This repository contains example codes of trajectory interpolation method on the basis of maximum entropy inverse reinforcement learning [1, 2].
 
 
 
 ## Citation
 If you find this code useful, please cite this paper:
-* T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," Ecosphere (submitted).
+* T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," Ecoshere, vol 9, no. 10, pp. e02447, 2018.
 
 
 
@@ -35,5 +35,5 @@ If you find this code useful, please cite this paper:
 
 
 ## Reference
-1. T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," (in preparation).
-
+1. T. Hirakawa, T. Yamashita, K. Yoda, T. Tamaki, and H. Fujiyoshi, "Travel Time-dependent Maximum Entropy Inverse Reinforcement Learning for Seabird Trajectory Prediction," in Asian Conference on Computer Vision, pp. 430-435, 2017.
+2. T. Hirakawa, T. Yamashita, T. Tamaki, H. Fujiyoshi, Y. Umezu, I. Takeuchi, S. Matsumoto, K. Yoda, "Can AI predict animal movements? Filling gaps in animal trajectories using Inverse Reinforcement Learning," Ecoshere, vol 9, no. 10, pp. e02447, 2018.
