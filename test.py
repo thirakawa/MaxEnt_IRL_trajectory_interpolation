@@ -21,16 +21,9 @@ IMAGE_FILE = "./data/image/image2.png"
 RESULT_DIR = "./RESULT"
 
 
-
-def optimal_control_single_thread(input_base_list, input_weight_path):
-    for base in input_base_list:
-        optimal_control_one_sample(base, input_weight_path)
-
-
-
 def optimal_control_one_sample(input_base, input_weight_path):
     model = MaxEntIRL()
-    model.load_trajectory(os.path.join(TRAJECTORY_PATH, input_base + ".npy"))
+    model.load_trajectory(os.path.join(TRAJECTORY_PATH, f'{input_base}.npy'))
     model.load_reward_weights(input_weight_path)
     model.load_features(FEATURE_MAP_FILE)
     model.load_image(IMAGE_FILE)
@@ -51,21 +44,31 @@ def optimal_control_one_sample(input_base, input_weight_path):
 
 
 
+def optimal_control_single_thread(input_base_list, input_weight_path):
+    for base in input_base_list:
+        optimal_control_one_sample(base, input_weight_path)
+
+
+def test_pickle(b_list):
+    return b_list
+
 if __name__ == '__main__':
 
-    trained_weight_file = "./RESULT/weight-015.txt"
+    trained_weight_file = "./RESULT/weight-000.txt"
     n_cpu = mp.cpu_count()
 
-    if not os.path.exists(RESULT_DIR):
-        os.mkdir(RESULT_DIR)
+    # if not os.path.exists(RESULT_DIR):
+        # os.mkdir(RESULT_DIR)
 
-    base_list = read_text(BASE_FILE)
-    split_base_list = chunk_list(base_list, (len(base_list) / n_cpu) + 1)
+    with open(BASE_FILE) as base_file:
+        base_list = [line.strip() for line in base_file]
+    split_base_list = chunk_list(base_list, int(len(base_list) / n_cpu) + 1)
 
+    mp.set_start_method('fork')
     threads = []
     for b_list in split_base_list:
         threads.append(mp.Process(target=optimal_control_single_thread,
-                                  args=(b_list, trained_weight_file)))
+                                  args=(b_list, trained_weight_file,)))
     for t in threads:
         t.start()
     for t in threads:

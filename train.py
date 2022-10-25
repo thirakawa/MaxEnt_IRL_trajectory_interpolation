@@ -17,6 +17,7 @@ from util import chunk_list, read_text
 
 
 BASE_FILE = "./data/basename.txt"
+BASE_FILE_2 = "./data/basename2.txt"
 TRAJECTORY_PATH = "./data/tracking"
 FEATURE_MAP_FILE = "./data/feature_map/feature_map_3d.npy"
 IMAGE_FILE = "./data/image/image2.png"
@@ -33,7 +34,10 @@ class Trainer:
         self.n_cpu = mp.cpu_count()
 
         self.basename_list = input_basename_list
-        self.split_base_list = chunk_list(self.basename_list, (len(self.basename_list) / self.n_cpu) + 1)
+        self.split_base_list = chunk_list(
+            self.basename_list,
+            int(len(self.basename_list) / self.n_cpu) + 1
+        )
         self.n_feature = np.load(FEATURE_MAP_FILE).shape[0]
         self.n_data = len(input_basename_list)
 
@@ -56,13 +60,13 @@ class Trainer:
         # compute empirical feature count
         for bname in self.basename_list:
             tmp_model = MaxEntIRL()
-            tmp_model.load_trajectory(os.path.join(TRAJECTORY_PATH, bname + ".npy"))
+            tmp_model.load_trajectory(os.path.join(TRAJECTORY_PATH, f"{bname}.npy"))
             tmp_model.update_weight(self.w)
             tmp_model.load_features(FEATURE_MAP_FILE)
             tmp_model.load_image(IMAGE_FILE)
             self.f_empirical += tmp_model.compute_empirical_feature_count()
         self.f_empirical /= self.n_feature
-        print "empirical feature count:", self.f_empirical
+        print("empirical feature count:", self.f_empirical)
 
         # make cache directory
         if not os.path.exists(CACHE_DIR):
@@ -70,20 +74,22 @@ class Trainer:
 
     def backward_forward_pass(self):
 
-        thread = []
-        for th_i, b_list in enumerate(self.split_base_list):
-            thread.append(mp.Process(target=self.back_forward_single_thread, args=(b_list, self.w, th_i)))
+        # thread = []
+        # mp.set_start_method('fork')
+        # for th_i, b_list in enumerate(self.split_base_list):
+            # thread.append(mp.Process(target=self.back_forward_single_thread, args=(b_list, self.w, th_i)))
 
-        for t in thread:
-            t.start()
-        for t in thread:
-            t.join()
+        # for t in thread:
+            # t.start()
+        # for t in thread:
+            # t.join()
 
         self.loglikelihood = 0.0
         self.f_expected *= 0.0
-        for th_i, t in enumerate(thread):
-            ll_tmp = np.load(os.path.join(CACHE_DIR, "%d-%d-ll.npy" % (self.pid, th_i)))
-            f_exp_tmp = np.load(os.path.join(CACHE_DIR, "%d-%d-fexp.npy" % (self.pid, th_i)))
+        # for th_i, t in enumerate(thread):
+        for th_i in range(0, 7):
+            ll_tmp = np.load(os.path.join(CACHE_DIR, f"{62137}-{th_i}-ll.npy"))
+            f_exp_tmp = np.load(os.path.join(CACHE_DIR, f"{62137}-{th_i}-fexp.npy"))
 
             self.loglikelihood += np.sum(ll_tmp)
             self.f_expected += np.sum(f_exp_tmp, axis=0)
@@ -97,7 +103,7 @@ class Trainer:
         f_expected_list = []
 
         for bn in basename:
-            print bn
+            print(bn)
             _start = time.time()
 
             model = MaxEntIRL()
@@ -117,7 +123,7 @@ class Trainer:
 
             _end = time.time()
 
-            print "done. time", _end - _start
+            print("done. time", _end - _start)
 
         # save
         np.save(os.path.join(CACHE_DIR, "%d-%d-ll.npy" % (self.pid, thread_index)), np.array(loglikelihood_tmp))
@@ -132,18 +138,18 @@ class Trainer:
         elif -self.DELTA < improvement < self.DELTA:
             improvement = 0
 
-        print "improved by", improvement
+        print("improved by", improvement)
 
         # update parameters
         if improvement < 0:
-            print "NO IMPROVEMENT: decrease step size and redo"
+            print("NO IMPROVEMENT: decrease step size and redo")
             self.lam = self.lam * 0.5
 
             for f in range(self.n_feature):
                 self.w[f] = self.w_best[f] * math.exp(self.lam * self.f_gradient[f])
 
         elif improvement > 0:
-            print "IMPROVEMENT: increase step size"
+            print("IMPROVEMENT: increase step size")
             self.w_best = self.w.copy()
             self.lam = self.lam * 2.0
 
@@ -153,12 +159,12 @@ class Trainer:
                 self.w[f] = self.w_best[f] * math.exp(self.lam * self.f_gradient[f])
 
         elif improvement == 0:
-            print "CONVERGED"
+            print("CONVERGED")
             self.converged = True
 
-        print "lambda:", self.lam
-        print "f_empirical:", self.f_empirical
-        print "f_expected:", self.f_expected
+        print("lambda:", self.lam)
+        print("f_empirical:", self.f_empirical)
+        print("f_expected:", self.f_expected)
 
     def save_parameter(self, output_filename):
         np.savetxt(output_filename, self.w)
@@ -169,7 +175,8 @@ if __name__ == '__main__':
     if not os.path.exists(RESULT_DIR):
         os.mkdir(RESULT_DIR)
 
-    basename_list = read_text(BASE_FILE)
+    with open(BASE_FILE) as base_file:
+        basename_list = [line.strip() for line in base_file]
 
     trainer = Trainer(basename_list)
 
@@ -183,7 +190,7 @@ if __name__ == '__main__':
         iteration += 1
 
         end = time.time()
-        print "time of this iteration:", end - start, "s"
+        print("time of this iteration:", end - start, "s")
 
     trainer.save_parameter(os.path.join(RESULT_DIR, "weight.txt"))
-    print "train: done."
+    print("train: done.")

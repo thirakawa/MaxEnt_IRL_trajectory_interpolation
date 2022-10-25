@@ -33,62 +33,62 @@ class MaxEntIRL:
 
     def load_trajectory(self, input_filename, verbose=False):
         if verbose:
-            print "load terminal points..."
+            print("load terminal points...")
         self.trajectory = np.load(input_filename)
         self.start = self.trajectory[0, :]
         self.end = self.trajectory[-1, :]
         if verbose:
-            print "    length of the trajectory:", self.trajectory.shape[0]
-            print "    start:", self.start
-            print "    end:", self.end
-            print ""
+            print("    length of the trajectory:", self.trajectory.shape[0])
+            print("    start:", self.start)
+            print("    end:", self.end)
+            print()
 
     def load_reward_weights(self, input_filename, verbose=False):
         if verbose:
-            print "load reward weights..."
+            print("load reward weights...")
         self.w = np.loadtxt(input_filename)
         if verbose:
-            print " number of weights loaded:", self.w.shape[0]
-            print ""
+            print(" number of weights loaded:", self.w.shape[0])
+            print("")
 
     def load_features(self, input_filename, verbose=False):
         if verbose:
-            print "load features..."
+            print("load features...")
 
         self.feature_map = np.load(input_filename)
 
         if self.feature_map.shape[0] != self.w.shape[0]:
-            print "ERROR: weight and feature have different length."
+            print("ERROR: weight and feature have different length.")
             sys.exit(-1)
         self.n_feature = self.feature_map.shape[0]
         self.state_size = self.feature_map[0].shape
         if verbose:
-            print "    number of feature maps loaded:", self.feature_map.shape[0]
-            print "    state space size:", self.state_size
-            print ""
+            print("    number of feature maps loaded:", self.feature_map.shape[0])
+            print("    state space size:", self.state_size)
+            print("")
 
     def load_image(self, input_filename, verbose=False):
         if verbose:
-            print "load image..."
+            print("load image...")
         self.img = cv2.imread(input_filename, 1)
         if verbose:
-            print "    done"
-            print ""
+            print( "    done")
+            print( "")
 
     def compute_reward(self, bias=0.0, verbose=False):
         if verbose:
-            print "compute reward value..."
+            print("compute reward value...")
         self.reward = np.zeros(self.state_size, dtype=np.float32)
         for i in range(self.n_feature):
             self.reward += self.w[i] * self.feature_map[i]
         self.reward += float(bias)
         if verbose:
-            print "    done"
-            print ""
+            print("    done")
+            print("")
 
     def compute_soft_value_function(self, output_filename=None, verbose=False):
         if verbose:
-            print "compute soft value function..."
+            print("compute soft value function...")
         v = [np.ones(self.state_size, dtype=np.float32) * -self.FLOAT_MAX,
              np.ones(self.state_size, dtype=np.float32) * -self.FLOAT_MAX]
 
@@ -134,7 +134,7 @@ class MaxEntIRL:
             v[0][is_searched] -= 10.0
 
             if np.sum(v[0][is_searched] > 0) > 0:
-                print "    ERROR: elements of V[0] should be lower than 0."
+                print("    ERROR: elements of V[0] should be lower than 0.")
                 sys.exit(-1)
 
             # init goal
@@ -151,19 +151,19 @@ class MaxEntIRL:
             n += 1
             # max iteration
             if n > 1000:
-                print "    WARNING: max number of iterations", n
+                print("    WARNING: max number of iterations", n)
                 break
 
         self.V = v[0].copy()
 
         # line break and save value map
-        print ""
+        print()
         if output_filename is not None:
             np.save(output_filename, self.V)
 
     def compute_policy(self, output_filename=None, verbose=False):
         if verbose:
-            print "compute policy..."
+            print("compute policy...")
 
         policy = []
         for i in range(self.n_action):
@@ -210,8 +210,8 @@ class MaxEntIRL:
 
         # save policy map
         if verbose:
-            print "    done"
-            print ""
+            print("    done")
+            print("")
 
         self.pax = np.array(policy)
 
@@ -220,7 +220,7 @@ class MaxEntIRL:
 
     def compute_forecast_distribution(self, output_filename=None, verbose=False):
         if verbose:
-            print "compute forecast distribution..."
+            print("compute forecast distribution...")
 
         self.D = np.zeros(self.state_size, dtype=np.float32)
         N = [self.D.copy(), self.D.copy()]
@@ -283,14 +283,14 @@ class MaxEntIRL:
 
         # output prob
         if verbose:
-            print "    done"
-            print ""
+            print("    done")
+            print()
 
         if output_filename is not None:
             np.save(output_filename, self.D)
 
     def map_probability(self, output_filename=None):
-        print "mapping probability..."
+        print("mapping probability...")
         probability = np.sum(self.D, axis=2)
         dst = self.color_map_cumulative_prob(probability)
         dst[dst < 1] = self.img[dst < 1]
@@ -303,11 +303,11 @@ class MaxEntIRL:
 
         if output_filename is not None:
             cv2.imwrite(output_filename, dst)
-        print "    done"
-        print ""
+        print("    done")
+        print()
 
     def make_backward_mask(self):
-        print "    make backward mask..."
+        print("    make backward mask...")
         mask = np.zeros(self.state_size, dtype=np.bool)
         mask[self.end[0], self.end[1], self.end[2]] = True
 
@@ -326,7 +326,7 @@ class MaxEntIRL:
         return mask
 
     def make_forward_mask(self):
-        print "    make forward mask..."
+        print("    make forward mask...")
         mask = np.zeros(self.state_size, dtype=np.bool)
         mask[self.start[0], self.start[1], self.start[2]] = True
 
@@ -411,8 +411,8 @@ class MaxEntIRL:
             a = trans_index[dy + 1, dx + 1]
 
             if a < 0:
-                print "ERROR: invalid action %d(%d, %d)" % (t, dx, dy)
-                print "preproces trajectory data property"
+                print(f"ERROR: invalid action {t}({dx}, {dy})")
+                print("preproces trajectory data property")
                 sys.exit(-1)
 
             val = np.log(self.pax[a][self.trajectory[t, 0], self.trajectory[t, 1], self.trajectory[t, 2]])

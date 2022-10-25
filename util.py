@@ -18,5 +18,3 @@ def read_text(filename):
 
 def chunk_list(input_list, n):
     return [input_list[x:x + n] for x in range(0, len(input_list), n)]
-
-
