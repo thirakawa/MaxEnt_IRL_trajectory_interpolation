@@ -11,8 +11,8 @@ If you find this code useful, please cite this paper:
 
 
 ## Requirements
-- Language: Python (2.7.\*)
-- Modules: Numpy, OpenCV, multiprocessing
+- Language: Python (3.0+)
+- `pip install -r requirements.txt` 
 
 
 
@@ -23,14 +23,17 @@ If you find this code useful, please cite this paper:
 
 ## Usage
 ### Making 3D feature map
-> cd data/feature_map \
-> python make_3d_feature_map.py 
+```
+cd data/feature_map \
+python make_3d_feature_map.py 
+```
 
 ### Training
-> python train.py
+`python train.py`
+
 
 ### Inference (interpolation)
-> python test.py
+`python test.py`
 
 
 
